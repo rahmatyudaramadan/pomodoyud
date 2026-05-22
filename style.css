@@ -1,0 +1,200 @@
+* {
+  box-sizing: border-box;
+}
+
+/* Trik pendaftaran variabel CSS modern agar transisi gradasi mulus */
+@property --bg-top {
+  syntax: "<color>";
+  initial-value: #4b6cb7;
+  inherits: false;
+}
+@property --bg-mid {
+  syntax: "<color>";
+  initial-value: #182848;
+  inherits: false;
+}
+@property --bg-bottom {
+  syntax: "<color>";
+  initial-value: #0f172a;
+  inherits: false;
+}
+
+:root {
+  /* FASE WORK: Tema Biru Dongker Mewah bawaan kamu */
+  --bg-top: #4b6cb7;
+  --bg-mid: #182848;
+  --bg-bottom: #0f172a;
+}
+
+body[data-phase="break"] {
+  /* FASE BREAK: Tema Toska Ijo Adem pilihanmu */
+  --bg-top: #14b8a6; /* Toska cerah di bagian puncak */
+  --bg-mid: #064e3b; /* Hijau hutan pekat di bagian tengah */
+  --bg-bottom: #022c22; /* Hijau kehitaman di bagian paling dasar */
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Gradasi radial menggunakan variable yang dinamis */
+  background: radial-gradient(
+    circle at top,
+    var(--bg-top) 0%,
+    var(--bg-mid) 55%,
+    var(--bg-bottom) 100%
+  );
+
+  color: #f8fafc;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  /* Animasi pemudaran warna selama 0.8 detik ketika class/attribute berubah */
+  transition:
+    --bg-top 0.8s ease,
+    --bg-mid 0.8s ease,
+    --bg-bottom 0.8s ease;
+}
+
+.pomodoro-container {
+  width: min(420px, 92vw);
+  padding: 2rem;
+  border-radius: 28px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.35);
+  text-align: center;
+}
+
+#status-label {
+  margin: 0;
+  font-size: 1.45rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c7d2fe;
+}
+
+#timer-display {
+  margin: 1.5rem 0;
+  font-size: clamp(3.5rem, 8vw, 5rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.volume-control {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  display: inline-flex;
+  flex-direction: column-reverse; /* Ikon di bawah, slider muncul ke atas */
+  align-items: center;
+  gap: 0; /* Ubah ke 0 dulu biar pas sembunyi gak ada jarak kosong */
+  padding: 0.85rem;
+  border-radius: 30px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.35);
+  z-index: 10;
+  width: 44px;
+  transition: all 0.3s ease; /* Biar perubahan tinggi kotak terasa mulus */
+}
+
+.volume-control label {
+  font-size: 1.1rem;
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+}
+
+.volume-control input[type="range"] {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  accent-color: #60a5fa;
+  margin: 0;
+  cursor: pointer;
+
+  /* KONDISI AWAL: Sembunyi total */
+  height: 0px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+}
+
+/* =======================================================
+   KONDISI SAAT AKTIF (Ditrigger pake JavaScript nanti)
+   ======================================================= */
+.volume-control.active {
+  gap: 0.7rem; /* Kasih jarak lagi pas slidernya muncul */
+}
+
+.volume-control.active input[type="range"] {
+  /* KONDISI AKTIF: Muncul menjulang ke atas */
+  height: 120px;
+  width: 15px;
+  opacity: 1;
+  visibility: visible;
+}
+
+button {
+  border: none;
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#btn-start {
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.24);
+}
+
+#btn-pause {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+#btn-reset {
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+body[data-phase="break"] .pomodoro-container {
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+@media (max-width: 400px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+}

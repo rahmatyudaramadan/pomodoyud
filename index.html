@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Timer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="pomodoro-container">
+      <!-- Status: Work atau Break -->
+      <h2 id="status-label">Work Time</h2>
+
+      <!-- Angka Timer -->
+      <div id="timer-display">25:00</div>
+
+      <!-- Tombol Kontrol -->
+      <div class="controls">
+        <button id="btn-start">Start</button>
+        <button id="btn-pause">Pause</button>
+        <button id="btn-reset">Reset</button>
+      </div>
+    </div>
+
+    <div class="volume-control">
+      <!-- Kita kasih ID di label buat target klik -->
+      <label id="volume-btn" for="volume-slider">🔊</label>
+
+      <input
+        type="range"
+        id="volume-slider"
+        min="0"
+        max="1"
+        step="0.1"
+        value="0.5"
+      />
+    </div>
+
+    <!-- ELEMEN AUDIO FIX -->
+    <!-- 1. Suara saat start fokus -->
+    <audio id="audio-start" src="sounds/daddyshome.mp3" preload="auto"></audio>
+
+    <!-- 2. Suara pas kamu nyerah/klik pause -->
+    <audio
+      id="audio-pause"
+      src="sounds/spongebobfail.mp3"
+      preload="auto"
+    ></audio>
+
+    <audio
+      id="audio-reset"
+      class="audio-reset"
+      src="sounds/ack.mp3"
+      preload="auto"
+    ></audio>
+
+    <!-- 3. Kumpulan gacha suara pas TIMER HABIS & waktunya break (bisa kamu tambah sesukamu bawahnya) -->
+    <audio
+      class="audio-break-pool"
+      src="sounds/yeahboi.mp3"
+      preload="auto"
+    ></audio>
+    <!-- <audio class="audio-break-pool" src="sounds/wow.mp3" preload="auto"></audio> -->
+
+    <script src="script.js"></script>
+  </body>
+</html>
