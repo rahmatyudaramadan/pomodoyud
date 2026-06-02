@@ -19,6 +19,9 @@ const BREAK_DURATION = 5 * 60;
 let remainingSeconds = WORK_DURATION;
 let intervalId = null;
 let isWorkPhase = true;
+let waktuTargetSelesai; // Menyimpan timestamp masa depan
+let isRunning = false;
+let wakeLock = null;
 
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
@@ -65,28 +68,61 @@ function tick() {
 }
 
 function startTimer() {
-  if (intervalId !== null) return;
-  if (isWorkPhase) {
-    playAudio(audioStart);
-    btnReset.disabled = false;
-  } else {
-    // Kalau dia ngelanjutin break setelah sempat di-pause
-    const randomIndex = Math.floor(Math.random() * audioBreakPool.length);
-    playAudio(audioBreakPool[randomIndex]);
-  }
+  if (isRunning) return;
+  isRunning = true;
 
-  intervalId = window.setInterval(tick, 1000);
+  // Suara mulai fokus dimainkan
+  playAudio(audioStart);
+
+  // Aktifkan wakeLock biar HP gak mati layarnya
+  aktifkanLayarTerus();
+
+  // Hitung waktu selesai: Waktu sekarang + sisa detik ke depan
+  waktuTargetSelesai = Date.now() + remainingSeconds * 1000;
+
+  timerInterval = setInterval(() => {
+    const waktuSekarang = Date.now();
+    const selisihMiliDetik = waktuTargetSelesai - waktuSekarang;
+
+    // Jika waktu habis
+    if (selisihMiliDetik <= 0) {
+      clearInterval(timerInterval);
+      remainingSeconds = 0;
+      isRunning = false;
+      lepasKunciLayar();
+      switchPhase(); // Otomatis pindah ke Break / Work
+      return;
+    }
+
+    // Update sisa detik dan tembak ke fungsi display yang bener
+    remainingSeconds = Math.ceil(selisihMiliDetik / 1000);
+    updateDisplay(); // Ini fungsi display yang terhubung ke HTML kamu
+  }, 200);
+
+  // Atur status tombol
   btnStart.disabled = true;
   btnPause.disabled = false;
+  btnReset.disabled = false;
 }
 
 function pauseTimer() {
-  if (intervalId === null) return;
+  if (!isRunning) return;
+  isRunning = false;
+
   playAudio(audioPause);
-  clearInterval(intervalId);
-  intervalId = null;
+  lepasKunciLayar();
+
+  // Matikan interval agar waktu berhenti mendetak
+  clearInterval(timerInterval);
+
   btnStart.disabled = false;
   btnPause.disabled = true;
+}
+
+// === GANTI RE-LOGIC TICK ===
+function tick() {
+  // Fungsi ini sudah tidak dipakai karena digantikan logika setInterval di atas,
+  // tapi kita biarkan kosong agar tidak memicu eror di tempat lain.
 }
 
 function resetTimer() {
@@ -115,6 +151,27 @@ function updateVolume() {
   audioBreakPool.forEach((audio) => {
     audio.volume = currentVolume;
   });
+}
+
+// Fungsi buat maksa layar HP tetep nyala
+async function aktifkanLayarTerus() {
+  try {
+    if ("wakeLock" in navigator) {
+      wakeLock = await navigator.wakeLock.request("screen");
+      console.log("Layar dikunci agar tetep nyala!");
+    }
+  } catch (err) {
+    console.log(`Gagal mengunci layar: ${err.message}`);
+  }
+}
+
+// Fungsi buat ngelepas kunci (biar HP bisa mati lagi pas timer distop/selesai)
+function lepasKunciLayar() {
+  if (wakeLock !== null) {
+    wakeLock.release();
+    wakeLock = null;
+    console.log("Kunci layar dilepas.");
+  }
 }
 
 volumeBtn.addEventListener("click", (e) => {
