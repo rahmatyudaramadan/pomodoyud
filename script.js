@@ -70,28 +70,30 @@ function startTimer() {
   isRunning = true;
 
   playAudio(audioStart);
-
   aktifkanLayarTerus();
 
+  // Hitung target waktu sejak tombol diklik
   waktuTargetSelesai = Date.now() + remainingSeconds * 1000;
 
   timerInterval = setInterval(() => {
     const waktuSekarang = Date.now();
-    const selisihMiliDetik = waktuTargetSelesai - waktuSekarang;
+    let selisihMiliDetik = waktuTargetSelesai - waktuSekarang;
 
-    // Jika waktu habis
+    // JIKA WAKTU HABIS (Bisa Work habis, atau Break habis)
     if (selisihMiliDetik <= 0) {
-      clearInterval(timerInterval);
-      remainingSeconds = 0;
-      isRunning = false;
-      lepasKunciLayar();
-      switchPhase(); // Otomatis pindah ke Break / Work
-      return;
+      // 1. Ganti fase dulu (kalau tadinya Work berubah jadi Break, dan sebaliknya)
+      switchPhase();
+
+      // 2. KUNCI AUTO-LOOP: Hitung TARGET WAKTU BARU untuk fase berikutnya saat itu juga!
+      waktuTargetSelesai = Date.now() + remainingSeconds * 1000;
+      selisihMiliDetik = waktuTargetSelesai - waktuSekarang;
+
+      // Jangan di-clearInterval! Biarkan intervalnya tetap hidup menggelinding
     }
 
-    // Update sisa detik dan tembak ke fungsi display yang bener
+    // Update sisa detik dan perbarui layar
     remainingSeconds = Math.ceil(selisihMiliDetik / 1000);
-    updateDisplay(); // Ini fungsi display yang terhubung ke HTML kamu
+    updateDisplay();
   }, 200);
 
   // Atur status tombol
