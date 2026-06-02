@@ -19,7 +19,7 @@ const BREAK_DURATION = 5 * 60;
 let remainingSeconds = WORK_DURATION;
 let intervalId = null;
 let isWorkPhase = true;
-let waktuTargetSelesai; // Menyimpan timestamp masa depan
+let waktuTargetSelesai;
 let isRunning = false;
 let wakeLock = null;
 
@@ -48,11 +48,9 @@ function switchPhase() {
   remainingSeconds = isWorkPhase ? WORK_DURATION : BREAK_DURATION;
   updateDisplay();
 
-  // LOGIKA SAAT TIMER HABIS OTOMATIS PANDAH FASE
   if (isWorkPhase) {
     playAudio(audioStart);
   } else {
-    // Kalau waktu kerja habis, kita gacha suara gembira dari pool audio break!
     const randomIndex = Math.floor(Math.random() * audioBreakPool.length);
     playAudio(audioBreakPool[randomIndex]);
   }
@@ -71,13 +69,10 @@ function startTimer() {
   if (isRunning) return;
   isRunning = true;
 
-  // Suara mulai fokus dimainkan
   playAudio(audioStart);
 
-  // Aktifkan wakeLock biar HP gak mati layarnya
   aktifkanLayarTerus();
 
-  // Hitung waktu selesai: Waktu sekarang + sisa detik ke depan
   waktuTargetSelesai = Date.now() + remainingSeconds * 1000;
 
   timerInterval = setInterval(() => {
