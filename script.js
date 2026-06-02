@@ -122,12 +122,18 @@ function tick() {
 
 function resetTimer() {
   playAudio(audioReset);
-  if (intervalId !== null) {
-    clearInterval(intervalId);
-    intervalId = null;
+  // FIX: Clear the correct interval variable
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
   }
+  isRunning = false;
   isWorkPhase = true;
   remainingSeconds = WORK_DURATION;
+
+  // FIX: Make sure the screen lock releases on reset
+  lepasKunciLayar();
+
   updateDisplay();
   btnStart.disabled = false;
   btnPause.disabled = true;
